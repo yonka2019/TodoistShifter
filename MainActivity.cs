@@ -12,7 +12,8 @@ using Todoist.Net.Models;
 
 namespace TodoistShifter
 {
-    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
+    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher =
+        true)]
     public class MainActivity : AppCompatActivity
     {
         private static readonly string DATE_SEPARATOR = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.DateSeparator;
@@ -26,6 +27,7 @@ namespace TodoistShifter
         private TodoistClient todoistClient;
         private Button minus, plus;
         private Project project;
+        private ListView tasksLV;
 
         protected async override void OnCreate(Bundle savedInstanceState)
         {
@@ -40,6 +42,19 @@ namespace TodoistShifter
             SetContentView(Resource.Layout.activity_main);
             SetRefs();
             SetEvents();
+
+            int[] to = { Resource.Id.textView1 };
+            List<IDictionary<string, object>> data = new List<IDictionary<string, object>>();
+            for (int i = 0; i < 3; i++)
+            {
+                IDictionary<string, object> item = new JavaDictionary<string, object>();
+                item[TASK_NAMES[i]] = "Item " + i;
+                data.Add(item);
+            }
+            SimpleAdapter adapter = new SimpleAdapter(this, data, Resource.Layout.custom_list_item, TASK_NAMES, to);
+
+
+            tasksLV.Adapter = adapter;
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
@@ -53,6 +68,7 @@ namespace TodoistShifter
         {
             minus = FindViewById<Button>(Resource.Id.minusButton);
             plus = FindViewById<Button>(Resource.Id.plusButton);
+            tasksLV = FindViewById<ListView>(Resource.Id.tasksLV);
         }
 
         private void SetEvents()

@@ -15,13 +15,17 @@ namespace TodoistShifter
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
     public class MainActivity : AppCompatActivity
     {
-        private const string TOKEN = "591120e00e2378e13011380577eb508045cb753b";
         private static readonly string DATE_SEPARATOR = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.DateSeparator;
+        private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
+
+        // TODOIST Settings
+        private const string TOKEN = "591120e00e2378e13011380577eb508045cb753b";
+        private const string PROJECT_NAME = "Тренировка";
+        private readonly string[] TASK_NAMES = { "Грудь", "Спина", "Пресс" };
 
         private TodoistClient todoistClient;
         private Button minus, plus;
         private Project project;
-        private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
 
         protected async override void OnCreate(Bundle savedInstanceState)
         {
@@ -29,13 +33,32 @@ namespace TodoistShifter
 
             todoistClient = new TodoistClient(TOKEN);
 
-            project = await GetProject("Тренировка");
+            project = await GetProject(PROJECT_NAME);
 
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
-            // Set our view from the "main" layout resource
+
             SetContentView(Resource.Layout.activity_main);
             SetRefs();
             SetEvents();
+        }
+
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
+        {
+            Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+
+            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+
+        private void SetRefs()
+        {
+            minus = FindViewById<Button>(Resource.Id.minusButton);
+            plus = FindViewById<Button>(Resource.Id.plusButton);
+        }
+
+        private void SetEvents()
+        {
+            minus.Click += Minus_Click;
+            plus.Click += Plus_Click;
         }
 
         private async Task<List<Item>> GetTasks(Project inProject)
@@ -48,10 +71,8 @@ namespace TodoistShifter
             {
                 if (task.ProjectId == inProject.Id)
                 {
-                    if (task.Content == "Грудь" || task.Content == "Спина" || task.Content == "Пресс")
-                    {
+                    if (TASK_NAMES.Contains(task.Content))
                         toUpdateTasks.Add(task);
-                    }
                 }
             }
             return toUpdateTasks;
@@ -61,12 +82,6 @@ namespace TodoistShifter
         {
             var projects = await todoistClient.Projects.GetAsync();
             return projects.FirstOrDefault(p => p.Name == name);
-        }
-
-        private void SetEvents()
-        {
-            minus.Click += Minus_Click;
-            plus.Click += Plus_Click;
         }
 
         private async void Plus_Click(object sender, System.EventArgs e)
@@ -85,7 +100,7 @@ namespace TodoistShifter
             {
                 semaphore.Release();
             }
-
+            Toast.MakeText(Application.Context, "Updated Successfully", ToastLength.Long).Show();
         }
 
         private async void Minus_Click(object sender, System.EventArgs e)
@@ -103,19 +118,7 @@ namespace TodoistShifter
             {
                 semaphore.Release();
             }
-        }
-
-        private void SetRefs()
-        {
-            minus = FindViewById<Button>(Resource.Id.minusButton);
-            plus = FindViewById<Button>(Resource.Id.plusButton);
-        }
-
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
-        {
-            Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-
-            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+            Toast.MakeText(Application.Context, "Updated Successfully", ToastLength.Long).Show();
         }
     }
 }

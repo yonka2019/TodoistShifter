@@ -16,7 +16,6 @@ namespace TodoistShifter
         true)]
     public class MainActivity : AppCompatActivity
     {
-        private static readonly string DATE_SEPARATOR = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.DateSeparator;
         private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
 
         // TODOIST Settings

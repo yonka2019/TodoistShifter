@@ -20,7 +20,7 @@ namespace TodoistShifter
         private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
 
         // TODOIST Settings
-        private const string TOKEN = "591120e00e2378e13011380577eb508045cb753b";
+        private const string TOKEN = "467cdee9de2097151eace658d4ecb0dd8dff5a63";
         private const string PROJECT_NAME = "Тренировка";
         private readonly string[] TASK_NAMES = { "Грудь", "Спина", "Пресс" };
 
@@ -133,7 +133,7 @@ namespace TodoistShifter
             {
                 foreach (Item task in await GetTasks(project))
                 {
-                    task.DueDate = new DueDate($"{task.DueDate.Date.Value.AddDays(1).ToShortDateString().Replace(DATE_SEPARATOR, "/")} every day");
+                    task.DueDate = new DueDate("every 3 days ", task.DueDate.Date.Value.AddDays(1), true);
                     await todoistClient.Items.UpdateAsync(task);
                 }
             }
@@ -153,7 +153,7 @@ namespace TodoistShifter
             {
                 foreach (Item task in await GetTasks(project))
                 {
-                    task.DueDate = new DueDate($"{task.DueDate.Date.Value.AddDays(-1).ToShortDateString().Replace(DATE_SEPARATOR, "/")} every day");
+                    task.DueDate = new DueDate("every 3 days ", task.DueDate.Date.Value.AddDays(-1), true);
                     await todoistClient.Items.UpdateAsync(task);
                 }
             }

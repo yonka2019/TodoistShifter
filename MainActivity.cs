@@ -18,10 +18,13 @@ namespace TodoistShifter
     {
         private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
 
-        // TODOIST Settings
-        private const string TOKEN = "467cdee9de2097151eace658d4ecb0dd8dff5a63";
-        private const string PROJECT_NAME = "Тренировка";
-        private readonly string[] TASK_NAMES = { "Грудь", "Спина", "Пресс" };
+        // -- Settings --
+        private const string TOKEN = "";  // Todoist API token (could be taken from Todoist application)
+        private const string PROJECT_NAME = "";  // project name where the tasks stored
+        private readonly string[] TASK_NAMES = { "", "", "" };  // name of tasks to shift
+        private const string RECURRING_TEXT = "";  // text to enable recurring (not necessary) ; for example : 'every 3 days'
+        private const int SHIFT_BY = 1;  // shift the given tasks by: (+ / - days)
+        // -- --- --
 
         private TodoistClient todoistClient;
         private Button minus, plus;
@@ -41,6 +44,7 @@ namespace TodoistShifter
             {
                 Android.App.AlertDialog.Builder dialog = new Android.App.AlertDialog.Builder(this);
                 Android.App.AlertDialog alert = dialog.Create();
+
                 alert.SetTitle("Can't authenticate into Todoist");
                 alert.SetMessage("Check your:\n" +
                     "• Internet connection\n" +
@@ -132,7 +136,7 @@ namespace TodoistShifter
             {
                 foreach (Item task in await GetTasks(project))
                 {
-                    task.DueDate = new DueDate("every 3 days ", task.DueDate.Date.Value.AddDays(1), true);
+                    task.DueDate = new DueDate(RECURRING_TEXT, task.DueDate.Date.Value.AddDays(SHIFT_BY), true);
                     await todoistClient.Items.UpdateAsync(task);
                 }
             }
@@ -152,7 +156,7 @@ namespace TodoistShifter
             {
                 foreach (Item task in await GetTasks(project))
                 {
-                    task.DueDate = new DueDate("every 3 days ", task.DueDate.Date.Value.AddDays(-1), true);
+                    task.DueDate = new DueDate(RECURRING_TEXT, task.DueDate.Date.Value.AddDays(SHIFT_BY * -1), true);
                     await todoistClient.Items.UpdateAsync(task);
                 }
             }

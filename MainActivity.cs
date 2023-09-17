@@ -19,10 +19,10 @@ namespace TodoistShifter
         private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
 
         // -- Settings --
-        private const string TOKEN = "";  // Todoist API token (could be taken from Todoist application)
-        private const string PROJECT_NAME = "";  // project name where the tasks stored
-        private readonly string[] TASK_NAMES = { "", "", "" };  // name of tasks to shift
-        private const string RECURRING_TEXT = "";  // text to enable recurring (not necessary) ; for example : 'every 3 days'
+        private const string TOKEN = "62f055d6fe557cf55e45ece12cb1cb04eb04f06e";  // Todoist API token (could be taken from Todoist application)
+        private const string PROJECT_NAME = "Gym";  // project name where the tasks stored
+        private readonly string[] TASK_NAMES = { "Chest", "Back" };  // name of tasks to shift
+        private const string RECURRING_TEXT = "every 3 days";  // text to enable recurring (not necessary) ; for example : 'every 3 days'
         private const int SHIFT_BY = 1;  // shift the given tasks by: (+ / - days)
         // -- --- --
 
@@ -139,12 +139,17 @@ namespace TodoistShifter
                     task.DueDate = new DueDate(RECURRING_TEXT, task.DueDate.Date.Value.AddDays(SHIFT_BY), true);
                     await todoistClient.Items.UpdateAsync(task);
                 }
+
+                Toast.MakeText(Application.Context, "Updated Successfully", ToastLength.Long).Show();
+            }
+            catch (System.Exception ex)
+            {
+                Toast.MakeText(Application.Context, $"Error: {ex.Message}", ToastLength.Long).Show();
             }
             finally
             {
                 semaphore.Release();
             }
-            Toast.MakeText(Application.Context, "Updated Successfully", ToastLength.Long).Show();
         }
 
         private async void Minus_Click(object sender, System.EventArgs e)

@@ -40,15 +40,13 @@ namespace TodoistShifter
                 todoistClient = new TodoistClient(TOKEN);
                 project = await GetProject(PROJECT_NAME);
             }
-            catch
+            catch (System.Exception ex)
             {
                 Android.App.AlertDialog.Builder dialog = new Android.App.AlertDialog.Builder(this);
                 Android.App.AlertDialog alert = dialog.Create();
 
                 alert.SetTitle("Can't authenticate into Todoist");
-                alert.SetMessage("Check your:\n" +
-                    "• Internet connection\n" +
-                    "• Todoist API token");
+                alert.SetMessage(ex.Message.ToString() + "\n\r" + ex.StackTrace.ToString() + "\n\r" + "\n\r");
 
                 alert.SetButton("OK", (c, ev) =>
                 {
